@@ -1,30 +1,11 @@
-# React + TypeScript + Vite
+# XO is unbeatable
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> A tic-tac-toe game playing against an AI, you can now try beating it here
 
-Currently, two official plugins are available:
+## Background
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Last week I was introduced about an AI playing tic-tac-toe using Minimax algorithm during my AI class. I was exciting and planed to bring it to live. Since building a tic-tac-toe on frontend is not going to take long and I enjoy doing frontend a lot. Now it is a good time for me to get a well understanding on this algorithm.
 
-## Expanding the ESLint configuration
+## Minimax Algorithm
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+When we have 2 players, each try to find an optimal move. So, it's best to assume that the other player would pick his most optimal move (minimizing)
