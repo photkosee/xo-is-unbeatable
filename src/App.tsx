@@ -1,9 +1,5 @@
-import React, { useState } from "react";
-
-import "./App.css";
-import ScoreBoard from "./components/scoreBoard/ScoreBoard";
-import Board from "./components/board/Board";
-import ResetButton from "./components/resetBtn/ResetBtn";
+import { useState } from "react";
+import Box from "./components/Box";
 
 const App = () => {
   const WIN_CONDITIONS = [
@@ -16,12 +12,23 @@ const App = () => {
     [0, 4, 8],
     [2, 4, 6],
   ];
-
   const [xPlaying, setXPlaying] = useState(true);
   const [comTurn, setComTurn] = useState(false);
-  const [board, setBoard] = useState(Array(9).fill(null));
+  const [board, setBoard] = useState(Array(9).fill("X"));
   const [scores, setScores] = useState({ xScore: 0, oScore: 0 });
   const [gameOver, setGameOver] = useState(false);
+
+  const checkWinner = (board: string[]) => {
+    for (let i = 0; i < WIN_CONDITIONS.length; i++) {
+      const [x, y, z] = WIN_CONDITIONS[i];
+
+      // Iterate through win conditions and check if either player satisfies them
+      if (board[x] && board[x] === board[y] && board[y] === board[z]) {
+        setGameOver(true);
+        return board[x];
+      }
+    }
+  };
 
   const handleBoxClick = (boxIdx: number) => {
     // Step 1: Update the board
@@ -54,28 +61,21 @@ const App = () => {
     setXPlaying(!xPlaying);
   };
 
-  const checkWinner = (board: string[]) => {
-    for (let i = 0; i < WIN_CONDITIONS.length; i++) {
-      const [x, y, z] = WIN_CONDITIONS[i];
-
-      // Iterate through win conditions and check if either player satisfies them
-      if (board[x] && board[x] === board[y] && board[y] === board[z]) {
-        setGameOver(true);
-        return board[x];
-      }
-    }
-  };
-
   const resetBoard = () => {
     setGameOver(false);
     setBoard(Array(9).fill(null));
   };
 
   return (
-    <div className="App">
-      <ScoreBoard scores={scores} xPlaying={xPlaying} />
-      <Board board={board} onClick={gameOver ? resetBoard : handleBoxClick} />
-      <ResetButton resetBoard={resetBoard} />
+    <div className="container flex flex-col gap-y-10 items-center justify-center h-screen">
+      <h1 className="flex justify-center text-white gap-x-2 text-3xl font-semibold">
+        XO is <p className="text-green-300">Unbeatable</p>
+      </h1>
+      <div className="grid grid-cols-3 gap-2">
+        {board.map((type, idx) => (
+          <Box key={idx} type={type} highlighted={idx % 2 === 0} />
+        ))}
+      </div>
     </div>
   );
 };
