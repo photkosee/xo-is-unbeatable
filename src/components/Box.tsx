@@ -9,7 +9,7 @@ interface BoxProps {
 const Box: FC<BoxProps> = ({ type, highlighted }) => {
   return (
     <div
-      className={`size-[calc(100vw/4)] max-h-32 max-w-32 bg-[#1f3540] rounded-md
+      className={`size-[calc(100vw/5)] max-h-32 max-w-32 bg-[#1f3540] rounded-md
       flex items-center justify-center ${
         type === ""
           ? "hover:bg-[#1f3540]/70 cursor-pointer"

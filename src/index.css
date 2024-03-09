@@ -4,9 +4,5 @@
 
 body {
   @apply bg-neutral-900;
-}
-
-h1,
-span {
   font-family: "Outfit", sans-serif;
 }

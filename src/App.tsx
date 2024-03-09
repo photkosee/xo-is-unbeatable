@@ -1,5 +1,15 @@
 import { useState } from "react";
 import Box from "./components/Box";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/react";
+import { Github, Info } from "lucide-react";
 
 const App = () => {
   const WIN_CONDITIONS = [
@@ -12,11 +22,11 @@ const App = () => {
     [0, 4, 8],
     [2, 4, 6],
   ];
-  const [xPlaying, setXPlaying] = useState(true);
-  const [comTurn, setComTurn] = useState(false);
-  const [board, setBoard] = useState(Array(9).fill("X"));
-  const [scores, setScores] = useState({ xScore: 0, oScore: 0 });
+  const [playerIsX, setPlayerIsX] = useState<boolean>(true);
+  const [playerTurn, setPlayerTurn] = useState(false);
+  const [board, setBoard] = useState(Array(9).fill(""));
   const [gameOver, setGameOver] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const checkWinner = (board: string[]) => {
     for (let i = 0; i < WIN_CONDITIONS.length; i++) {
@@ -63,19 +73,92 @@ const App = () => {
 
   const resetBoard = () => {
     setGameOver(false);
-    setBoard(Array(9).fill(null));
+    setBoard(Array(9).fill(""));
   };
 
   return (
-    <div className="container flex flex-col gap-y-10 items-center justify-center h-screen">
+    <div className="container flex flex-col gap-y-3 lg:gap-y-5 items-center justify-center min-h-screen py-5">
       <h1 className="flex justify-center text-white gap-x-2 text-3xl font-semibold">
         XO is <p className="text-green-300">Unbeatable</p>
+        <Button isIconOnly size="sm" onClick={onOpen}>
+          <Info />
+        </Button>
+        <Button isIconOnly size="sm">
+          <Github />
+        </Button>
       </h1>
       <div className="grid grid-cols-3 gap-2">
         {board.map((type, idx) => (
           <Box key={idx} type={type} highlighted={idx % 2 === 0} />
         ))}
       </div>
+      <div className="flex flex-col sm:flex-row gap-x-5 gap-y-1">
+        <Button
+          className="font-semibold text-xl flex items-center gap-x-1 min-w-36"
+          radius="sm"
+          onClick={() => setPlayerIsX(!playerIsX)}
+        >
+          Switch to
+          {playerIsX ? (
+            <p className="text-amber-500">O</p>
+          ) : (
+            <p className="text-green-600">X</p>
+          )}
+        </Button>
+        <Button
+          className="font-semibold text-xl min-w-36"
+          radius="sm"
+          onClick={resetBoard}
+        >
+          Restart
+        </Button>
+      </div>
+
+      <Modal backdrop={"blur"} isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Choosing between X or O
+              </ModalHeader>
+              <ModalBody>
+                <p>
+                  This is a tic-tac-toe game. X player will make the first move
+                  follow by O player. You are assigned to be X by default but
+                  you can switch it later on.
+                </p>
+                <p>
+                  You are going to play against me, an AI. Please don't feel bad
+                  if you lose since I'm Unbeatable.
+                </p>
+                <div className="flex justify-around gap-x-2">
+                  <Button
+                    className="font-bold text-3xl text-green-500 py-9"
+                    variant="ghost"
+                    onClick={() => {
+                      setPlayerIsX(true);
+                      onClose();
+                    }}
+                  >
+                    X
+                  </Button>
+                  <Button
+                    className="font-bold text-3xl text-amber-500 py-9"
+                    variant="ghost"
+                    onClick={() => {
+                      setPlayerIsX(false);
+                      onClose();
+                    }}
+                  >
+                    O
+                  </Button>
+                </div>
+              </ModalBody>
+              <ModalFooter></ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
