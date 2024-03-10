@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "./components/Box";
 import {
   Button,
@@ -23,82 +23,217 @@ const App = () => {
     [2, 4, 6],
   ];
   const [playerIsX, setPlayerIsX] = useState<boolean>(true);
-  const [playerTurn, setPlayerTurn] = useState(false);
-  const [board, setBoard] = useState(Array(9).fill(""));
-  const [gameOver, setGameOver] = useState(false);
+  const [aiStart, setAiStart] = useState<boolean>(false);
+  const [board, setBoard] = useState<Array<"X" | "O" | "">>(Array(9).fill(""));
+  const [winner, setWinner] = useState<"X" | "O" | "">("");
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const checkWinner = (board: string[]) => {
+  useEffect(() => {
+    onOpen();
+  }, []);
+
+  useEffect(() => {
+    if (!playerIsX) {
+      board[2] = "X";
+      setBoard([...board]);
+    }
+  }, [aiStart]);
+
+  const checkWinner = (currBoard: Array<"X" | "O" | "">, player: "X" | "O") => {
     for (let i = 0; i < WIN_CONDITIONS.length; i++) {
       const [x, y, z] = WIN_CONDITIONS[i];
 
-      // Iterate through win conditions and check if either player satisfies them
-      if (board[x] && board[x] === board[y] && board[y] === board[z]) {
-        setGameOver(true);
-        return board[x];
+      if (
+        currBoard[x] === player &&
+        currBoard[y] === player &&
+        currBoard[z] === player
+      ) {
+        return true;
       }
     }
+
+    return false;
   };
 
-  const handleBoxClick = (boxIdx: number) => {
-    // Step 1: Update the board
-    const updatedBoard = board.map((value, idx) => {
+  const minimax = (
+    newBoard: Array<"X" | "O" | "">,
+    player: "X" | "O",
+    depth: number
+  ) => {
+    const ai = playerIsX ? "O" : "X";
+    const opponent = playerIsX ? "X" : "O";
+
+    if (checkWinner(newBoard, opponent)) {
+      console.log("hu");
+      return { index: 0, score: 100 - depth };
+    } else if (checkWinner(newBoard, ai)) {
+      console.log("ai");
+      return { index: 0, score: 100 + depth };
+    } else if (newBoard.filter((spot) => spot === "").length === 0) {
+      console.log("DRAW");
+      return { index: 0, score: 0 };
+    }
+
+    const moves: { index: number; score: number }[] = [];
+    newBoard.forEach((box, idx) => {
+      if (box === "") {
+        const newMove: {
+          index: number;
+          score: number;
+        } = {
+          index: idx,
+          score: 0,
+        };
+
+        const tmpBoard = [...newBoard];
+        tmpBoard[idx] = player;
+
+        if (player === ai) {
+          const result = minimax(tmpBoard, opponent, depth + 1);
+          newMove.score = result.score;
+        } else {
+          const result = minimax(tmpBoard, ai, depth + 1);
+          newMove.score = result.score;
+        }
+
+        moves.push(newMove);
+      }
+    });
+
+    let bestMove: number = 0;
+    if (player === ai) {
+      // maximizing ai's turn
+      let bestScore = -Infinity;
+      moves.forEach((move, idx) => {
+        if (move.score > bestScore) {
+          bestScore = move.score;
+          bestMove = idx;
+        }
+      });
+    } else {
+      // minimizing opponent's turn
+      let bestScore = Infinity;
+      moves.forEach((move, idx) => {
+        if (move.score < bestScore) {
+          bestScore = move.score;
+          bestMove = idx;
+        }
+      });
+    }
+
+    return moves[bestMove];
+  };
+
+  const playerMove = (boxIdx: number) => {
+    let updatedBoard = board.map((value, idx) => {
       if (idx === boxIdx) {
-        return xPlaying ? "X" : "O";
+        return playerIsX ? "X" : "O";
       } else {
         return value;
       }
     });
-
     setBoard(updatedBoard);
-
-    // Step 2: Check if either player has won the game
-    const winner = checkWinner(updatedBoard);
-
-    if (winner) {
-      if (winner === "O") {
-        let { oScore } = scores;
-        oScore += 1;
-        setScores({ ...scores, oScore });
-      } else {
-        let { xScore } = scores;
-        xScore += 1;
-        setScores({ ...scores, xScore });
-      }
+    if (checkWinner(updatedBoard, playerIsX ? "X" : "O")) {
+      setWinner(playerIsX ? "X" : "O");
+      updatedBoard = ["X", "X", "X", "X", "X", "X", "X", "X", "X"];
     }
+    return updatedBoard;
+  };
 
-    // Step 3: Change active player
-    setXPlaying(!xPlaying);
+  const aiMove = (
+    tmpBoard: Array<"X" | "O" | "">,
+    newBoard: Array<"X" | "O" | "">,
+    boxIdx: number
+  ) => {
+    const bestMove = minimax(tmpBoard, playerIsX ? "O" : "X", 0).index;
+    const updatedBoard = newBoard.map((value, idx) => {
+      if (idx === boxIdx) {
+        return playerIsX ? "X" : "O";
+      } else if (idx === bestMove) {
+        return playerIsX ? "O" : "X";
+      } else {
+        return value;
+      }
+    });
+    setBoard(updatedBoard);
+    checkWinner(updatedBoard, playerIsX ? "O" : "X") &&
+      setWinner(playerIsX ? "O" : "X");
+  };
+
+  const handleBoxClick = (boxIdx: number) => {
+    if (winner !== "") return;
+    const newBoard = playerMove(boxIdx);
+    if (newBoard.filter((box) => box === "X").length === 9) return;
+    // AI moves
+    const tmpBoard = [...newBoard];
+    aiMove(tmpBoard, newBoard, boxIdx);
   };
 
   const resetBoard = () => {
-    setGameOver(false);
+    setWinner("");
     setBoard(Array(9).fill(""));
+    setAiStart((prev) => !prev);
   };
 
   return (
-    <div className="container flex flex-col gap-y-3 lg:gap-y-5 items-center justify-center min-h-screen py-5">
-      <h1 className="flex justify-center text-white gap-x-2 text-3xl font-semibold">
-        XO is <p className="text-green-300">Unbeatable</p>
-        <Button isIconOnly size="sm" onClick={onOpen}>
-          <Info />
-        </Button>
-        <Button isIconOnly size="sm">
-          <Github />
-        </Button>
-      </h1>
+    <div className="flex flex-col gap-y-3 lg:gap-y-5 items-center justify-center min-h-screen py-5">
+      <div className="container flex flex-col gap-y-1 items-center">
+        <h1 className="flex justify-center text-white gap-x-2 text-3xl font-semibold">
+          XO is <p className="text-green-300">Unbeatable</p>
+          <Button isIconOnly size="sm" onClick={onOpen}>
+            <Info />
+          </Button>
+          <a href="https://github.com/photkosee" target="_blank">
+            <Button isIconOnly size="sm">
+              <Github />
+            </Button>
+          </a>
+        </h1>
+        <p className="text-white text-lg flex gap-x-2">
+          {winner === "X" &&
+            `${
+              playerIsX
+                ? "You won!?  I blame my creator..."
+                : "You lose :(  As always, I'm unbeatable..."
+            }`}
+          {winner === "O" &&
+            `${
+              playerIsX
+                ? "You lose :(  As always, I'm unbeatable..."
+                : "You won!?  I blame my creator..."
+            }`}
+          {winner === "" && (
+            <>
+              Your turn as an
+              {playerIsX ? (
+                <p className="text-green-400">X</p>
+              ) : (
+                <p className="text-amber-500">O</p>
+              )}
+            </>
+          )}
+        </p>
+      </div>
       <div className="grid grid-cols-3 gap-2">
         {board.map((type, idx) => (
-          <Box key={idx} type={type} highlighted={idx % 2 === 0} />
+          <Box
+            key={idx}
+            type={type}
+            highlighted={idx % 2 === 0}
+            onClick={() => handleBoxClick(idx)}
+          />
         ))}
       </div>
       <div className="flex flex-col sm:flex-row gap-x-5 gap-y-1">
         <Button
           className="font-semibold text-xl flex items-center gap-x-1 min-w-36"
           radius="sm"
-          onClick={() => setPlayerIsX(!playerIsX)}
+          onClick={() => {
+            setPlayerIsX(!playerIsX);
+            resetBoard();
+          }}
         >
-          Switch to
+          Switch to play as an
           {playerIsX ? (
             <p className="text-amber-500">O</p>
           ) : (
@@ -106,7 +241,7 @@ const App = () => {
           )}
         </Button>
         <Button
-          className="font-semibold text-xl min-w-36"
+          className="font-semibold text-xl"
           radius="sm"
           onClick={resetBoard}
         >
@@ -119,17 +254,21 @@ const App = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Choosing between X or O
+                Choosing to go first or go second
               </ModalHeader>
               <ModalBody>
                 <p>
-                  This is a tic-tac-toe game. X player will make the first move
-                  follow by O player. You are assigned to be X by default but
-                  you can switch it later on.
+                  This is a tic-tac-toe game. An X player will make the first
+                  move follow by an O player. You are assigned to be X by
+                  default but you can always switch it later on.
                 </p>
                 <p>
                   You are going to play against me, an AI. Please don't feel bad
-                  if you lose since I'm Unbeatable.
+                  if you lose since I'm Unbeatable!
+                </p>
+                <p>
+                  Click on a GitHub icon to visit my GitHub page for more
+                  projects and fun!
                 </p>
                 <div className="flex justify-around gap-x-2">
                   <Button
@@ -137,6 +276,7 @@ const App = () => {
                     variant="ghost"
                     onClick={() => {
                       setPlayerIsX(true);
+                      resetBoard();
                       onClose();
                     }}
                   >
@@ -147,6 +287,7 @@ const App = () => {
                     variant="ghost"
                     onClick={() => {
                       setPlayerIsX(false);
+                      resetBoard();
                       onClose();
                     }}
                   >
