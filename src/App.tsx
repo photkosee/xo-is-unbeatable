@@ -25,7 +25,7 @@ const App = () => {
   const [playerIsX, setPlayerIsX] = useState<boolean>(true);
   const [aiStart, setAiStart] = useState<boolean>(false);
   const [board, setBoard] = useState<Array<"X" | "O" | "">>(Array(9).fill(""));
-  const [winner, setWinner] = useState<"X" | "O" | "">("");
+  const [winner, setWinner] = useState<"X" | "O" | "" | "T">("");
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
@@ -64,13 +64,10 @@ const App = () => {
     const opponent = playerIsX ? "X" : "O";
 
     if (checkWinner(newBoard, opponent)) {
-      console.log("hu");
-      return { index: 0, score: 100 - depth };
+      return { index: 0, score: -100 - depth };
     } else if (checkWinner(newBoard, ai)) {
-      console.log("ai");
       return { index: 0, score: 100 + depth };
     } else if (newBoard.filter((spot) => spot === "").length === 0) {
-      console.log("DRAW");
       return { index: 0, score: 0 };
     }
 
@@ -158,15 +155,26 @@ const App = () => {
     setBoard(updatedBoard);
     checkWinner(updatedBoard, playerIsX ? "O" : "X") &&
       setWinner(playerIsX ? "O" : "X");
+
+    return updatedBoard;
   };
 
   const handleBoxClick = (boxIdx: number) => {
-    if (winner !== "") return;
-    const newBoard = playerMove(boxIdx);
-    if (newBoard.filter((box) => box === "X").length === 9) return;
-    // AI moves
-    const tmpBoard = [...newBoard];
-    aiMove(tmpBoard, newBoard, boxIdx);
+    if (winner !== "" && winner !== "T") return;
+    let newBoard = playerMove(boxIdx);
+    if (newBoard.filter((box) => box === "").length === 0) {
+      setWinner("T");
+      return;
+    }
+    if (!(newBoard.filter((box) => box === "X").length === 9)) {
+      // AI moves
+      const tmpBoard = [...newBoard];
+      newBoard = aiMove(tmpBoard, newBoard, boxIdx);
+    }
+    if (newBoard.filter((box) => box === "").length === 0) {
+      setWinner("T");
+      return;
+    }
   };
 
   const resetBoard = () => {
@@ -202,6 +210,7 @@ const App = () => {
                 ? "You lose :(  As always, I'm unbeatable..."
                 : "You won!?  I blame my creator..."
             }`}
+          {winner === "T" && "It's a tie, I'm still unbeatable!"}
           {winner === "" && (
             <>
               Your turn as an
@@ -233,7 +242,7 @@ const App = () => {
             resetBoard();
           }}
         >
-          Switch to play as an
+          Restart to play as an
           {playerIsX ? (
             <p className="text-amber-500">O</p>
           ) : (
