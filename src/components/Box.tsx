@@ -1,5 +1,6 @@
+import { FC } from "react";
+
 import { Circle, X } from "lucide-react";
-import React, { FC } from "react";
 
 interface BoxProps {
   type: "X" | "O" | "";
