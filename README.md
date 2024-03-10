@@ -8,10 +8,10 @@ Last week, during my AI class, I was introduced to an AI playing tic-tac-toe usi
 
 ## Minimax Algorithm
 
-The algorithm works by considering when players taking turns. Each aiming to maximize their score while minimizing their opponent's score. The algorithm would ends up looking like a tree of possible outcomes when each player taking turn in any possible ways.
+The algorithm works by considering when players taking turns. Each aiming to maximize their score while minimizing their opponent's score. The algorithm would ends up looking like a tree of possible outcomes when each player taking turns in any possible ways.
 
 ![alt text](image-1.png)
 
-> Thank you for the image from https://blog.aaronccwong.com/2018/i-created-an-ai-that-beats-me-at-tic-tac-toe/
+> Thank you for the image from [this site](https://blog.aaronccwong.com/2018/i-created-an-ai-that-beats-me-at-tic-tac-toe/).
 
 As you could see when X is taking a turn in the second level of the tree. In the image above, if X wins the game, the score will be 100. If X loses the game, the score will be -100. And the score will be 0 if it's a tie. Then, X will pick the maximum score in it's trun while picking the minimum score in its opponent's turn. Representing the most optimal move for X.
