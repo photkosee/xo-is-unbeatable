@@ -1,6 +1,6 @@
-# XO is unbeatable
+# XO is Unbeatable
 
-> A tic-tac-toe game playing against an AI, you can now try beating it here
+> A tic-tac-toe game playing against an AI, you can now try beating it [here](https://photkosee.github.io/xo-is-unbeatable/).
 
 ## Background
 
