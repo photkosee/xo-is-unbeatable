@@ -56,18 +56,14 @@ const App = () => {
     return false;
   };
 
-  const minimax = (
-    newBoard: Array<"X" | "O" | "">,
-    player: "X" | "O",
-    depth: number
-  ) => {
+  const minimax = (newBoard: Array<"X" | "O" | "">, player: "X" | "O") => {
     const ai = playerIsX ? "O" : "X";
     const opponent = playerIsX ? "X" : "O";
 
     if (checkWinner(newBoard, opponent)) {
-      return { index: 0, score: -100 - depth };
+      return { index: 0, score: -1 };
     } else if (checkWinner(newBoard, ai)) {
-      return { index: 0, score: 100 + depth };
+      return { index: 0, score: 1 };
     } else if (newBoard.filter((spot) => spot === "").length === 0) {
       return { index: 0, score: 0 };
     }
@@ -87,10 +83,10 @@ const App = () => {
         tmpBoard[idx] = player;
 
         if (player === ai) {
-          const result = minimax(tmpBoard, opponent, depth + 1);
+          const result = minimax(tmpBoard, opponent);
           newMove.score = result.score;
         } else {
-          const result = minimax(tmpBoard, ai, depth + 1);
+          const result = minimax(tmpBoard, ai);
           newMove.score = result.score;
         }
 
@@ -143,7 +139,7 @@ const App = () => {
     newBoard: Array<"X" | "O" | "">,
     boxIdx: number
   ) => {
-    const bestMove = minimax(tmpBoard, playerIsX ? "O" : "X", 0).index;
+    const bestMove = minimax(tmpBoard, playerIsX ? "O" : "X").index;
     const updatedBoard = newBoard.map((value, idx) => {
       if (idx === boxIdx) {
         return playerIsX ? "X" : "O";
@@ -162,18 +158,33 @@ const App = () => {
 
   const handleBoxClick = (boxIdx: number) => {
     if (winner !== "" && winner !== "T") return;
+
     let newBoard = playerMove(boxIdx);
     if (newBoard.filter((box) => box === "").length === 0) {
-      setWinner("T");
+      if (checkWinner(newBoard, playerIsX ? "X" : "O")) {
+        setWinner(playerIsX ? "X" : "O");
+      } else if (checkWinner(newBoard, playerIsX ? "O" : "X")) {
+        setWinner(playerIsX ? "O" : "X");
+      } else {
+        setWinner("T");
+      }
       return;
     }
+
     if (!(newBoard.filter((box) => box === "X").length === 9)) {
       // AI moves
       const tmpBoard = [...newBoard];
       newBoard = aiMove(tmpBoard, newBoard, boxIdx);
     }
-    if (newBoard.filter((box) => box === "").length === 0) {
-      setWinner("T");
+
+    if (board.filter((box) => box === "").length === 0) {
+      if (checkWinner(board, playerIsX ? "X" : "O")) {
+        setWinner(playerIsX ? "X" : "O");
+      } else if (checkWinner(board, playerIsX ? "O" : "X")) {
+        setWinner(playerIsX ? "O" : "X");
+      } else {
+        setWinner("T");
+      }
       return;
     }
   };
