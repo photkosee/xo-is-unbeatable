@@ -177,7 +177,7 @@ const App = () => {
       newBoard = aiMove(tmpBoard, newBoard, boxIdx);
     }
 
-    if (board.filter((box) => box === "").length === 0) {
+    if (newBoard.filter((box) => box === "").length === 0) {
       if (checkWinner(board, playerIsX ? "X" : "O")) {
         setWinner(playerIsX ? "X" : "O");
       } else if (checkWinner(board, playerIsX ? "O" : "X")) {
