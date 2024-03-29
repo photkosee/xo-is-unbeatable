@@ -1,6 +1,6 @@
-# XO is Unbeatable
+# <p align="center">XO is Unbeatable</p>
 
-> A tic-tac-toe game playing against an AI, you can now try beating it [here](https://photkosee.github.io/xo-is-unbeatable/).
+<p align="center">A tic-tac-toe game playing against my AI, you can now try beating it <a href="https://photkosee.github.io/xo-is-unbeatable/">here</a></p>
 
 ## Background
 
