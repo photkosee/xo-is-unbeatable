@@ -7,16 +7,93 @@
 A tic-tac-toe game playing against my AI, you can now try beating it <a href="https://photkosee.github.io/xo-is-unbeatable/">here!</a>
 </p>
 
+### Log
+
+- 21/04/2024 Utilize Alpha-Beta Pruning (Negamax) for better performance
+
 ## Background
 
 Last week, during my AI class, I was introduced to an AI playing tic-tac-toe using the Minimax algorithm. I was excited and planned to bring it to life. Since building a tic-tac-toe on the front end will not take long, and I enjoy doing front-end work a lot, this is going to be a mini-project. Now is a good time for me to get a good understanding of this algorithm.
 
-## Minimax Algorithm
+## Minimax
 
-The algorithm works by considering when players taking turns. Each aiming to maximize their score while minimizing their opponent's score. The algorithm would ends up looking like a tree of possible outcomes when each player taking turns in any possible ways.
+The algorithm explores all possible moves and counter-moves and make decisions based on the assumption of optimal play by both players, to determine the best move for the current player.
 
-![alt text](image-1.png)
+## Alpha-Beta Pruning
 
-> Thank you for the image from [this site](https://blog.aaronccwong.com/2018/i-created-an-ai-that-beats-me-at-tic-tac-toe/).
+The Alpha-Beta Pruning is like Minimax but can reduce the number of nodes evaluated in the search tree, improving the efficiency of the search. By keeping track of alpha, the best value that the maximizing player can currently do, and beta, the best value the minimizing player can currently do.
 
-As you could see when X is taking a turn in the second level of the tree. In the image above, if X wins the game, the score will be 100. If X loses the game, the score will be -100. And the score will be 0 if it's a tie. Then, X will pick the maximum score in it's trun while picking the minimum score in its opponent's turn. Representing the most optimal move for X.
+And whenever the value of a node exceeds the beta value at any point during the search, then further exploration can be skipped since it won't affect the final result, it implies that the current player has already found a better move that all further moves wouldn't be as good.
+
+## Negamax
+
+A simplified version of Minimax, combining functions for maximizing and minimizing players into one. The value of a postion for one player is the negation of the value for the other player, called zero-sum.
+
+```
+const alphabeta = (
+    newBoard: Array<"X" | "O" | "">,
+    currPlayer: "X" | "O",
+    depth: number,
+    alpha: number,
+    beta: number,
+    bestMove: Array<number>
+) => {
+  let bestEvaluation: number = -Infinity;
+  const opponent: "X" | "O" =
+    currPlayer === "X" ? "O" : "X";
+
+  // When there is a winner
+  if (checkWinner(newBoard, opponent)) {
+    return -10000 + depth;
+  }
+
+  let currMove = 0;
+  newBoard.forEach((box, idx) => {
+    // Check for available moves
+    if (box === "") {
+      const tmpBoard = [...newBoard];
+      currMove = idx;
+      // Try this move
+      tmpBoard[currMove] = currPlayer;
+      const currEvaluation: number = -alphabeta(
+        tmpBoard,
+        opponent,
+        depth + 1,
+        -beta,
+        -alpha,
+        bestMove
+      );
+
+      if (currEvaluation > bestEvaluation) {
+        bestEvaluation = currEvaluation;
+        bestMove[depth] = currMove;
+        if (bestEvaluation > alpha) {
+          alpha = bestEvaluation;
+
+          // Pruning
+          if (alpha >= beta) {
+            return alpha;
+          }
+        }
+      }
+    }
+  });
+
+  if (currMove === 0) {
+    return 0;
+  } else {
+    return alpha;
+  }
+};
+```
+
+## Feature
+
+- AI (Alpha-beta pruning)
+
+## Built with
+
+- [Vite 5](https://vitejs.dev/) - Development environment
+- [React 18](https://react.dev/) - Development environment
+- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+- [Next UI](https://nextui.org/) - Components library for User Interface

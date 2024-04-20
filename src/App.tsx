@@ -27,6 +27,7 @@ const App = () => {
   const [aiStart, setAiStart] = useState<boolean>(false);
   const [board, setBoard] = useState<Array<"X" | "O" | "">>(Array(9).fill(""));
   const [winner, setWinner] = useState<"X" | "O" | "" | "T">("");
+  const [turn, setTurn] = useState<number>(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
@@ -56,66 +57,54 @@ const App = () => {
     return false;
   };
 
-  const minimax = (newBoard: Array<"X" | "O" | "">, player: "X" | "O") => {
-    const ai = playerIsX ? "O" : "X";
-    const opponent = playerIsX ? "X" : "O";
+  const alphabeta = (
+    newBoard: Array<"X" | "O" | "">,
+    currPlayer: "X" | "O",
+    depth: number,
+    alpha: number,
+    beta: number,
+    bestMove: Array<number>
+  ) => {
+    let bestEvaluation: number = -Infinity;
+    const opponent: "X" | "O" = currPlayer === "X" ? "O" : "X";
 
     if (checkWinner(newBoard, opponent)) {
-      return { index: 0, score: -1 };
-    } else if (checkWinner(newBoard, ai)) {
-      return { index: 0, score: 1 };
-    } else if (newBoard.filter((spot) => spot === "").length === 0) {
-      return { index: 0, score: 0 };
+      return -10000 + depth;
     }
 
-    const moves: { index: number; score: number }[] = [];
+    let currMove = 0;
     newBoard.forEach((box, idx) => {
       if (box === "") {
-        const newMove: {
-          index: number;
-          score: number;
-        } = {
-          index: idx,
-          score: 0,
-        };
-
         const tmpBoard = [...newBoard];
-        tmpBoard[idx] = player;
+        currMove = idx;
+        tmpBoard[currMove] = currPlayer;
+        const currEvaluation: number = -alphabeta(
+          tmpBoard,
+          opponent,
+          depth + 1,
+          -beta,
+          -alpha,
+          bestMove
+        );
 
-        if (player === ai) {
-          const result = minimax(tmpBoard, opponent);
-          newMove.score = result.score;
-        } else {
-          const result = minimax(tmpBoard, ai);
-          newMove.score = result.score;
+        if (currEvaluation > bestEvaluation) {
+          bestEvaluation = currEvaluation;
+          bestMove[depth] = currMove;
+          if (bestEvaluation > alpha) {
+            alpha = bestEvaluation;
+            if (alpha >= beta) {
+              return alpha;
+            }
+          }
         }
-
-        moves.push(newMove);
       }
     });
 
-    let bestMove: number = 0;
-    if (player === ai) {
-      // maximizing ai's turn
-      let bestScore = -Infinity;
-      moves.forEach((move, idx) => {
-        if (move.score > bestScore) {
-          bestScore = move.score;
-          bestMove = idx;
-        }
-      });
+    if (currMove === 0) {
+      return 0;
     } else {
-      // minimizing opponent's turn
-      let bestScore = Infinity;
-      moves.forEach((move, idx) => {
-        if (move.score < bestScore) {
-          bestScore = move.score;
-          bestMove = idx;
-        }
-      });
+      return alpha;
     }
-
-    return moves[bestMove];
   };
 
   const playerMove = (boxIdx: number) => {
@@ -127,6 +116,7 @@ const App = () => {
       }
     });
     setBoard(updatedBoard);
+    setTurn((prev) => prev + 1);
     if (checkWinner(updatedBoard, playerIsX ? "X" : "O")) {
       setWinner(playerIsX ? "X" : "O");
       updatedBoard = ["X", "X", "X", "X", "X", "X", "X", "X", "X"];
@@ -139,16 +129,26 @@ const App = () => {
     newBoard: Array<"X" | "O" | "">,
     boxIdx: number
   ) => {
-    const bestMove = minimax(tmpBoard, playerIsX ? "O" : "X").index;
+    const bestMove: Array<number> = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    alphabeta(
+      tmpBoard,
+      playerIsX ? "O" : "X",
+      turn,
+      -Infinity,
+      Infinity,
+      bestMove
+    );
+    console.log(bestMove[turn]);
     const updatedBoard = newBoard.map((value, idx) => {
       if (idx === boxIdx) {
         return playerIsX ? "X" : "O";
-      } else if (idx === bestMove) {
+      } else if (idx === bestMove[turn]) {
         return playerIsX ? "O" : "X";
       } else {
         return value;
       }
     });
+    setTurn((prev) => prev + 1);
     setBoard(updatedBoard);
     checkWinner(updatedBoard, playerIsX ? "O" : "X") &&
       setWinner(playerIsX ? "O" : "X");
@@ -178,9 +178,9 @@ const App = () => {
     }
 
     if (newBoard.filter((box) => box === "").length === 0) {
-      if (checkWinner(board, playerIsX ? "X" : "O")) {
+      if (checkWinner(newBoard, playerIsX ? "X" : "O")) {
         setWinner(playerIsX ? "X" : "O");
-      } else if (checkWinner(board, playerIsX ? "O" : "X")) {
+      } else if (checkWinner(newBoard, playerIsX ? "O" : "X")) {
         setWinner(playerIsX ? "O" : "X");
       } else {
         setWinner("T");
