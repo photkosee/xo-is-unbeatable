@@ -97,3 +97,8 @@ const alphabeta = (
 - [React 18](https://react.dev/) - Development environment
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
 - [Next UI](https://nextui.org/) - Components library for User Interface
+
+## Author
+Phot Koseekrainiramon
+- [LinkedIn](https://www.linkedin.com/in/phot-kosee/)
+- [GitHub](https://github.com/photkosee)

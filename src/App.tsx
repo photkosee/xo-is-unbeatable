@@ -204,7 +204,7 @@ const App = () => {
             <Info />
           </Button>
           <a
-            href="https://github.com/photkosee"
+            href="https://github.com/photkosee/xo-is-unbeatable"
             target="_blank"
             className="flex h-full items-center justify-center"
           >
