@@ -7,13 +7,24 @@
 A tic-tac-toe game playing against my AI, you can now try beating it <a href="https://photkosee.github.io/xo-is-unbeatable/">here!</a>
 </p>
 
-### Log
+### Table of Contents
 
-- 21/04/2024 Utilize Alpha-Beta Pruning (Negamax) for better performance
+1. [Inspiration](#inspiration)
+2. [What this does?](#what-this-does)
+3. [Minimax](#minimax)
+4. [Alpha-Beta Pruning](#alpha-beta-pruning)
+5. [Negamax](#negamax)
+6. [Built with](#built-with)
+7. [Author](#author)
+8. [Deployment](#deployment)
 
-## Background
+## Inspiration
 
 Last week, during my AI class, I was introduced to an AI playing tic-tac-toe using the Minimax algorithm. I was excited and planned to bring it to life. Since building a tic-tac-toe on the front end will not take long, and I enjoy doing front-end work a lot, this is going to be a mini-project. Now is a good time for me to get a good understanding of this algorithm.
+
+## What this does?
+
+Users will be able to choose whether to play first or second in a tic-tac-toe game against my AI, which is implemented using Alpha-Beta Pruning Algorithm. Note that my AI never loses!
 
 ## Minimax
 
@@ -87,10 +98,6 @@ const alphabeta = (
 };
 ```
 
-## Feature
-
-- AI (Alpha-beta pruning)
-
 ## Built with
 
 - [Vite 5](https://vitejs.dev/) - Development environment
@@ -99,6 +106,17 @@ const alphabeta = (
 - [Next UI](https://nextui.org/) - Components library for User Interface
 
 ## Author
+
 Phot Koseekrainiramon
 - [LinkedIn](https://www.linkedin.com/in/phot-kosee/)
 - [GitHub](https://github.com/photkosee)
+
+## Deployment
+
+This project is deployed to GitHub Pages:
+
+[https://photkosee.github.io/xo-is-unbeatable/](https://photkosee.github.io/xo-is-unbeatable/)
+
+### Log
+
+- 21/04/2024 Utilize Alpha-Beta Pruning (Negamax) for better performance
