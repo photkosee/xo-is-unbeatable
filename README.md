@@ -1,13 +1,10 @@
-<p align="center">
-  <a href="https://photkosee.github.io/xo-is-unbeatable/">
-    <img width="270" src="./public/images/logo.png">
-  </a>
-</p>
+# <p align="center"><a href="https://photkosee.github.io/xo-is-unbeatable/"><img width="270" src="./public/images/logo.png"></a></p>
+
 <p align="center">
 A tic-tac-toe game playing against my AI, you can now try beating it <a href="https://photkosee.github.io/xo-is-unbeatable/">here!</a>
 </p>
 
-### Table of Contents
+## Table of Contents
 
 1. [Inspiration](#inspiration)
 2. [What this does?](#what-this-does)
@@ -108,7 +105,7 @@ const alphabeta = (
 ## Author
 
 Phot Koseekrainiramon
-- [LinkedIn](https://www.linkedin.com/in/phot-kosee/)
+- [LinkedIn](https://www.linkedin.com/in/photkosee/)
 - [GitHub](https://github.com/photkosee)
 
 ## Deployment
